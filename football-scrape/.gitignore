@@ -1,4 +1,7 @@
 .idea/
 .DS_Store
 .ipynb_checkpoints
+
 /files/*.csv
+/files/players/*.csv
+/files/teams/*.csv
