@@ -4,4 +4,6 @@
 
 /files/*.csv
 /files/players/*.csv
-/files/teams/*.csv
+/files/stats/*.csv
+
+/webdriver/chromedriver

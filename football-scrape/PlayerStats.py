@@ -1,41 +1,40 @@
 #!/usr/bin/python
-
 import csv
 import os.path
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import re
 
 
-def write_passing_headers():
-    header_rows = soup.find('table', attrs={'id': 'passing'}).find('thead')
-    header_rows = header_rows.find_all('tr', attrs={'class': None})
+def write_stat_headers(stat_name, stat_header_written):
+    if soup.find('table', attrs={'id': stat_name}) and not stat_header_written:
 
-    cols = header_rows[0].find_all('th')
-    cols = [ele.text.strip().encode('utf-8') for ele in cols]
-    cols.insert(0, 'Player')
-    cols.insert(1, 'Player Link')
-    cols.insert(5, 'Tm Link')  # Add team link header column
+        header_rows = soup.find('table', attrs={'id': stat_name}).find('thead')
+        header_rows = header_rows.find_all('tr', attrs={'class': None})
 
-    # Start a new file and write headers to the file
-    with open(os.path.join(dirname, path, 'stats',  'passing.csv'), 'w') as writeFile:
-        writer = csv.writer(writeFile)
-        writer.writerow(cols)
-    writeFile.close()
+        cols = header_rows[0].find_all('th')
+        cols = [ele.text.strip().encode('utf-8') for ele in cols]
+        cols.insert(0, 'Year')
+        cols.insert(1, 'Year Link')
+        cols.insert(5, 'Tm Link')  # Add team link header column
 
-    global passing_headers
-    passing_headers = True
+        # Start a new file and write headers to the file
+        with open(os.path.join(dirname, path, 'stats',  stat_name + '.csv'), 'w') as writeFile:
+            writer = csv.writer(writeFile)
+            writer.writerow(cols)
+        writeFile.close()
+
+        return True
+    else:
+        return stat_header_written
 
 
-def passing_stats():
-    if soup.find('table', attrs={'id': 'passing'}):
-        global passing_headers
-
-        if not passing_headers:
-            write_passing_headers()
+def write_stats(stat_name):
+    if soup.find('table', attrs={'id': stat_name}):
 
         # Pull out the passing table body
-        passing_body_rows = soup.find('table', attrs={'id': 'passing'}).find('tbody').find_all('tr', attrs={'class': 'full_table'})
+        passing_body_rows = soup.find('table', attrs={'id': stat_name}).find('tbody').find_all('tr', attrs={'class': 'full_table'})
         passing_data = []  # Var to hold all the passing data before we write it to a file
 
         for passing_row in passing_body_rows:
@@ -57,7 +56,7 @@ def passing_stats():
             cols.insert(5, team_link)  # Add team link
             passing_data.append(cols)
 
-        with open(os.path.join(dirname, path, 'stats', 'passing.csv'), 'a') as writeFile:
+        with open(os.path.join(dirname, path, 'stats', stat_name + '.csv'), 'a') as writeFile:
             writer = csv.writer(writeFile)
             writer.writerows(passing_data)
         writeFile.close()
@@ -85,16 +84,42 @@ players = get_players()
 
 # Keep track of if the headers have been written for each file
 passing_headers = False
+running_headers = False
+defense_headers = False
+scoring_headers = False
+
 
 baseUrl = 'https://www.pro-football-reference.com'
 
 for player in players:
-    r = requests.get(baseUrl + player[1])
+    options = Options()
+    options.headless = True
+
+    browser = webdriver.Chrome(executable_path='/Users/rhmiller/notebooks/football-scrape/webdriver/chromedriver',
+                               options=options)
+    browser.get(baseUrl + player[1])
+    innerHTML = browser.execute_script("return document.body.innerHTML")
 
     # Parse the page
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = BeautifulSoup(innerHTML, 'html.parser')
 
-    passing_stats()
+    # Deal with passing
+    passing_headers = write_stat_headers('passing', passing_headers)
+    write_stats('passing')
+
+    # Deal with rushing & receiving
+    running_headers = write_stat_headers('rushing_and_receiving', running_headers)
+    write_stats('rushing_and_receiving')
+
+    # Deal with defense
+    defense_headers = write_stat_headers('defense', defense_headers)
+    write_stats('defense')
+
+    # Deal with scoring table
+    scoring_headers = write_stat_headers('scoring', scoring_headers)
+    write_stats('scoring')
+
+    browser.close()
     print('player ' + player[0] + ' complete')
 
 print('Complete')
