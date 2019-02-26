@@ -7,17 +7,30 @@ from bs4 import BeautifulSoup
 import re
 
 
-def write_stat_headers(stat_name, stat_header_written):
+def write_stat_headers(stat_name, stat_header_written, stat_links, additional_headers = None):
     if soup.find('table', attrs={'id': stat_name}) and not stat_header_written:
 
+        # Get the table header
         header_rows = soup.find('table', attrs={'id': stat_name}).find('thead')
         header_rows = header_rows.find_all('tr', attrs={'class': None})
 
-        cols = header_rows[0].find_all('th')
-        cols = [ele.text.strip().encode('utf-8') for ele in cols]
-        cols.insert(0, 'Year')
-        cols.insert(1, 'Year Link')
-        cols.insert(5, 'Tm Link')  # Add team link header column
+        # Define the data object
+        cols = []
+
+        # Prepend the column list with player name and player link fields
+        if additional_headers is not None:
+            for additional_header in additional_headers:
+                cols.append(additional_header)
+
+        # Get all the header column names and strip them of whitespace
+        headers = header_rows[0].find_all('th')
+
+        for ele in headers:
+            cols.append(ele.text.strip().encode('utf-8'))
+
+        # For all the stat links get the name of the stat and append them to the header list
+        for stat_link in stat_links:
+            cols.append(cols[stat_link] + ' Link')
 
         # Start a new file and write headers to the file
         with open(os.path.join(dirname, path, 'stats',  stat_name + '.csv'), 'w') as writeFile:
@@ -25,12 +38,14 @@ def write_stat_headers(stat_name, stat_header_written):
             writer.writerow(cols)
         writeFile.close()
 
+        # Return the column headers to pass to the write_stats method
         return True
     else:
+        # If the stat doesn't exist or are already written just return them again in their current state
         return stat_header_written
 
 
-def write_stats(stat_name):
+def write_stats(stat_name, stat_links):
     if soup.find('table', attrs={'id': stat_name}):
 
         # Pull out the passing table body
@@ -38,23 +53,37 @@ def write_stats(stat_name):
         passing_data = []  # Var to hold all the passing data before we write it to a file
 
         for passing_row in passing_body_rows:
+            # Deal with header column in the row
             cols = passing_row.find_all('th')
-            year = re.sub(r"\D", "", cols[0].text.strip())  # Get year, removing special characters
+            first_column = re.sub(r"\*", "", cols[0].text.strip())  # Get column header strip *
+            first_column_link = first_column
 
+            if cols[0].find('a')['href']:
+                first_column_link = cols[0].find('a')['href']
+
+            # Get the rest of the columns in the row
             cols = passing_row.find_all('td')
 
-            if cols[1].find('a'):
-                team_link = cols[1].find('a')['href']  # Team Link from the team link column
-            else:
-                team_link = 'none'
+            data = [ele.text.strip() for ele in cols]
 
-            cols = [ele.text.strip() for ele in cols]
+            # Add in the first column
+            data.insert(0, first_column)
 
-            cols.insert(0, player[0])
-            cols.insert(1, player[1])
-            cols.insert(2, year)
-            cols.insert(5, team_link)  # Add team link
-            passing_data.append(cols)
+            # Prepend with player name and player link
+            data.insert(0, player[0])
+            data.insert(1, player[1])
+
+            # For all the stat links get the link and then append them to the list
+            for stat_link in stat_links:
+                if stat_link == 0:
+                    data.append(first_column_link)
+                elif cols[stat_link].find('a'):
+                    data.append(cols[stat_link].find('a')['href'])  # Team Link from the team link column
+                else:
+                    data.append(cols[stat_link].text.strip())
+
+            # Add composed columns to list
+            passing_data.append(data)
 
         with open(os.path.join(dirname, path, 'stats', stat_name + '.csv'), 'a') as writeFile:
             writer = csv.writer(writeFile)
@@ -88,6 +117,8 @@ running_headers = False
 defense_headers = False
 scoring_headers = False
 
+default_stat_links = [0, 1, 5]
+default_additional_headers = ['Player Name', 'Player Link']
 
 baseUrl = 'https://www.pro-football-reference.com'
 
@@ -104,22 +135,26 @@ for player in players:
     soup = BeautifulSoup(innerHTML, 'html.parser')
 
     # Deal with passing
-    passing_headers = write_stat_headers('passing', passing_headers)
-    write_stats('passing')
+    passing_headers = write_stat_headers('passing', passing_headers, default_stat_links,
+                                         additional_headers=default_additional_headers)
+    write_stats('passing', default_stat_links)
 
     # Deal with rushing & receiving
-    running_headers = write_stat_headers('rushing_and_receiving', running_headers)
-    write_stats('rushing_and_receiving')
+    running_headers = write_stat_headers('rushing_and_receiving', running_headers, default_stat_links,
+                                         additional_headers=default_additional_headers)
+    write_stats('rushing_and_receiving', default_stat_links)
 
     # Deal with defense
-    defense_headers = write_stat_headers('defense', defense_headers)
-    write_stats('defense')
+    defense_headers = write_stat_headers('defense', defense_headers, default_stat_links,
+                                         additional_headers=default_additional_headers)
+    write_stats('defense', default_stat_links)
 
     # Deal with scoring table
-    scoring_headers = write_stat_headers('scoring', scoring_headers)
-    write_stats('scoring')
+    scoring_headers = write_stat_headers('scoring', scoring_headers, default_stat_links,
+                                         additional_headers=default_additional_headers)
+    write_stats('scoring', default_stat_links)
 
     browser.close()
     print('player ' + player[0] + ' complete')
 
-print('Complete')
+print('Player stats Complete')
