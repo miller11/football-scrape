@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import re
 
 
-def write_stat_headers(stat_name, stat_header_written, stat_links, additional_headers = None):
+def write_stat_headers(stat_name, stat_header_written, stat_links, additional_headers=None):
     if soup.find('table', attrs={'id': stat_name}) and not stat_header_written:
 
         # Get the table header
@@ -33,7 +33,7 @@ def write_stat_headers(stat_name, stat_header_written, stat_links, additional_he
             cols.append(cols[stat_link] + ' Link')
 
         # Start a new file and write headers to the file
-        with open(os.path.join(dirname, path, 'stats',  stat_name + '.csv'), 'w') as writeFile:
+        with open(os.path.join(dirname, path, 'stats', stat_name + '.csv'), 'w') as writeFile:
             writer = csv.writer(writeFile)
             writer.writerow(cols)
         writeFile.close()
@@ -45,11 +45,12 @@ def write_stat_headers(stat_name, stat_header_written, stat_links, additional_he
         return stat_header_written
 
 
-def write_stats(stat_name, stat_links):
+def write_stats(stat_name, stat_links, additional_data=None):
     if soup.find('table', attrs={'id': stat_name}):
 
         # Pull out the passing table body
-        passing_body_rows = soup.find('table', attrs={'id': stat_name}).find('tbody').find_all('tr', attrs={'class': 'full_table'})
+        passing_body_rows = soup.find('table', attrs={'id': stat_name}).find('tbody').find_all('tr', attrs={
+            'class': 'full_table'})
         passing_data = []  # Var to hold all the passing data before we write it to a file
 
         for passing_row in passing_body_rows:
@@ -69,9 +70,10 @@ def write_stats(stat_name, stat_links):
             # Add in the first column
             data.insert(0, first_column)
 
-            # Prepend with player name and player link
-            data.insert(0, player[0])
-            data.insert(1, player[1])
+            # Prepend with additional dat matching additional headers
+            if additional_data is not None:
+                for idx, val in enumerate(additional_data):
+                    data.insert(idx, additional_data[idx])
 
             # For all the stat links get the link and then append them to the list
             for stat_link in stat_links:
@@ -137,22 +139,22 @@ for player in players:
     # Deal with passing
     passing_headers = write_stat_headers('passing', passing_headers, default_stat_links,
                                          additional_headers=default_additional_headers)
-    write_stats('passing', default_stat_links)
+    write_stats('passing', default_stat_links, additional_data=player)
 
     # Deal with rushing & receiving
     running_headers = write_stat_headers('rushing_and_receiving', running_headers, default_stat_links,
                                          additional_headers=default_additional_headers)
-    write_stats('rushing_and_receiving', default_stat_links)
+    write_stats('rushing_and_receiving', default_stat_links, additional_data=player)
 
     # Deal with defense
     defense_headers = write_stat_headers('defense', defense_headers, default_stat_links,
                                          additional_headers=default_additional_headers)
-    write_stats('defense', default_stat_links)
+    write_stats('defense', default_stat_links, additional_data=player)
 
     # Deal with scoring table
     scoring_headers = write_stat_headers('scoring', scoring_headers, default_stat_links,
                                          additional_headers=default_additional_headers)
-    write_stats('scoring', default_stat_links)
+    write_stats('scoring', default_stat_links, additional_data=player)
 
     browser.close()
     print('player ' + player[0] + ' complete')
