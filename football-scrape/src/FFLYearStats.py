@@ -23,14 +23,14 @@ def parse_html():
 
 def write_stat_headers(header_data):
     # Start a new file and write headers to the file
-    with open(os.path.join(dir_name, path, 'stats', table_id + '.csv'), 'w') as writeFile:
+    with open(os.path.join(dir_name, '..', path, 'stats', table_id + '.csv'), 'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerow(header_data)
     writeFile.close()
 
 
 def write_stats(table_data):
-    with open(os.path.join(dir_name, path, 'stats', table_id + '.csv'), 'a') as writeFile:
+    with open(os.path.join(dir_name, '..', path, 'stats', table_id + '.csv'), 'a') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(table_data)
     writeFile.close()
