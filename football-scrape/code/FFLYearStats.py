@@ -4,7 +4,7 @@ import os.path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-from TableParser import TableParser
+from code.TableParser import TableParser
 
 
 def parse_html():
@@ -12,8 +12,7 @@ def parse_html():
     options = Options()
     options.headless = True
 
-    browser = webdriver.Chrome(executable_path='/Users/rhmiller/notebooks/football-scrape/webdriver/chromedriver',
-                               options=options)
+    browser = webdriver.Chrome(options=options)
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 
@@ -46,8 +45,8 @@ default_stat_links = [2, 3]
 
 write_headers = True
 
-# Loop from 1970 to 2018
-for year in range(2018, 2019):
+# Loop from 1992 to 2018 (We don't have targets before 1992)
+for year in range(1992, 2019):
     url = base_url.format(year)
 
     # parse the html page

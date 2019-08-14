@@ -128,8 +128,11 @@ for player in players:
     options = Options()
     options.headless = True
 
+    chrome_options = Options()
+    chrome_options.add_argument('--disable-dev-shm-usage')
+
     browser = webdriver.Chrome(executable_path='/Users/rhmiller/notebooks/football-scrape/webdriver/chromedriver',
-                               options=options)
+                               options=options, chrome_options=chrome_options)
     browser.get(baseUrl + player[1])
     innerHTML = browser.execute_script("return document.body.innerHTML")
 
