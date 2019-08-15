@@ -16,8 +16,20 @@ def parse_html():
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 
+    write_page_html(write_page_html(inner_html))
+
     # Parse the page with BeautifulSoup
     return BeautifulSoup(inner_html, 'html.parser')
+
+
+def write_page_html(page_html):
+    # Start a new file and write headers to the file
+    html_file_name = os.path.join(dir_name, '..', path, 'pages', 'fflYears', 'fantasy_' + str(year) + '.html')
+
+    with open(html_file_name, 'w') as writeFile:
+        writer = csv.writer(writeFile)
+        writer.writerow(page_html)
+    writeFile.close()
 
 
 def write_stat_headers(header_data):
