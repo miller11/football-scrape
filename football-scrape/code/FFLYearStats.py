@@ -12,24 +12,23 @@ def parse_html():
     options = Options()
     options.headless = True
 
-    browser = webdriver.Chrome(options=options)
+    browser = webdriver.Chrome(options=options, executable_path="/Users/rhmiller/chromedriver")
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 
-    write_page_html(write_page_html(inner_html))
+    write_page_html(inner_html)
 
     # Parse the page with BeautifulSoup
     return BeautifulSoup(inner_html, 'html.parser')
 
 
+# write the html to file for easier work later
 def write_page_html(page_html):
-    # Start a new file and write headers to the file
     html_file_name = os.path.join(dir_name, '..', path, 'pages', 'fflYears', 'fantasy_' + str(year) + '.html')
 
-    with open(html_file_name, 'w') as writeFile:
-        writer = csv.writer(writeFile)
-        writer.writerow(page_html)
-    writeFile.close()
+    f = open(html_file_name, 'w')
+    f.write(page_html)
+    f.close()
 
 
 def write_stat_headers(header_data):

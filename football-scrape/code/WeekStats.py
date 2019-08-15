@@ -27,6 +27,17 @@ def build_gamelog_link(player_link):
     return '{}/gamelog/{}/'.format(player_link.replace('.htm', ''), year)
 
 
+def write_page_html(page_html, player_link):
+    player_link = player_link.replace('/', '').replace('.htm', '')
+
+    # Start a new file and write headers to the file
+    html_file_name = os.path.join(dir_name, '..', path, 'pages', 'playerStats', player_link + str(year) + '.html')
+
+    f = open(html_file_name, 'w')
+    f.write(page_html)
+    f.close()
+
+
 # simple method to output the pandas dataframe to csv in the stats folder
 def write_file(data_frame, file_year):
     # Start a new file and write data frame to the file
@@ -69,10 +80,12 @@ for player in players:
     options.headless = True
     options.add_argument('--no-sandbox')
 
-    browser = webdriver.Chrome(options=options)
+    browser = webdriver.Chrome(options=options, executable_path="/Users/rhmiller/chromedriver")
 
     browser.get(base_url + build_gamelog_link(player[1]))
     innerHTML = browser.execute_script("return document.body.innerHTML")
+    write_page_html(innerHTML, player[1])
+
     browser.close()
 
     # Parse the page
