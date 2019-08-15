@@ -12,7 +12,7 @@ def parse_html():
     options = Options()
     options.headless = True
 
-    browser = webdriver.Chrome(options=options, executable_path="/Users/rhmiller/chromedriver")
+    browser = webdriver.Chrome(options=options, executable_path="/usr/loca/bin/chromedriver")
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 
