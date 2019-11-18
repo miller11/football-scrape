@@ -80,7 +80,7 @@ for player in players:
     options.headless = True
     options.add_argument('--no-sandbox')
 
-    browser = webdriver.Chrome(options=options, executable_path="/usr/loca/bin/chromedriver")
+    browser = webdriver.Chrome(options=options, executable_path="/usr/bin/chromedriver")
 
     browser.get(base_url + build_gamelog_link(player[1]))
     innerHTML = browser.execute_script("return document.body.innerHTML")

@@ -1,18 +1,13 @@
 #!/usr/bin/python
 import csv
 import os.path
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-from code.TableParser import TableParser
+from TableParser import TableParser
+from BrowserUtil import BrowserUtil
 
 
 def parse_html():
-    # get headless chrome driver and get inner html
-    options = Options()
-    options.headless = True
-
-    browser = webdriver.Chrome(options=options, executable_path="/usr/loca/bin/chromedriver")
+    browser = BrowserUtil.get_browser()
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 

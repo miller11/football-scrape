@@ -1,7 +1,12 @@
-FROM python:3.6.7-alpine3.6
+FROM nickgryg/alpine-pandas
+
+RUN apk add chromium chromium-chromedriver
+
+ENV USE_HEADLESS_BROWSER True
+ENV CHROMEDRIVER_PATH "/usr/bin/chromedriver"
+
+WORKDIR "/usr/workspace"
 
 
-#RUN apk update
-#RUN apk add chromium chromium-chromedriver
 
-
+ENTRYPOINT ["/bin/sh"]
