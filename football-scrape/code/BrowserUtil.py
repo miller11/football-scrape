@@ -9,6 +9,8 @@ class BrowserUtil:
 
         if "USE_HEADLESS_BROWSER" in os.environ:
             self.headless_browser = True
+        else:
+            self.headless_browser = False
 
     def get_browser(self):
         # get headless chrome driver and get inner html

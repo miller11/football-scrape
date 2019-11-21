@@ -1,13 +1,16 @@
 #!/usr/bin/python
 import csv
-import os.path
+import os
 from bs4 import BeautifulSoup
 from TableParser import TableParser
 from BrowserUtil import BrowserUtil
+from FileUtil import FileUtil
 
 
 def parse_html():
-    browser = BrowserUtil.get_browser()
+    browser_util = BrowserUtil()
+    browser = browser_util.get_browser()
+
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
 
@@ -25,17 +28,22 @@ def write_page_html(page_html):
     f.write(page_html)
     f.close()
 
+    print(html_file_name)
+
+    FileUtil().upload_to_bucket('fantasy_' + str(year) + '.html', html_file_name,
+                                os.getenv('FANTASY_HTML_BUCKET', 'fantasy-year-html'))
+
 
 def write_stat_headers(header_data):
     # Start a new file and write headers to the file
-    with open(os.path.join(dir_name, '..', path, 'stats', table_id + '.csv'), 'w') as writeFile:
+    with open(stats_file_name, 'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerow(header_data)
     writeFile.close()
 
 
 def write_stats(table_data):
-    with open(os.path.join(dir_name, '..', path, 'stats', table_id + '.csv'), 'a') as writeFile:
+    with open(stats_file_name, 'a') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(table_data)
     writeFile.close()
@@ -46,13 +54,14 @@ table_id = 'fantasy'  # Id of the table to be parsed
 base_url = 'https://www.pro-football-reference.com/years/{}/fantasy.htm'  # base url of years to iterate
 dir_name = os.path.dirname(__file__)  # project directory base path
 path = r"files"  # directory within the project to write file output
+stats_file_name = os.path.join(dir_name, '..', path, 'stats', table_id + '.csv')
 
 default_stat_links = [2, 3]
 
 write_headers = True
 
 # Loop from 1992 to 2018 (We don't have targets before 1992)
-for year in range(1992, 2019):
+for year in range(os.getenv('START_YEAR', 1992), os.getenv('END_YEAR', 1993)):
     url = base_url.format(year)
 
     # parse the html page
@@ -70,3 +79,6 @@ for year in range(1992, 2019):
     # get the table data
     write_stats(tableParser.parse_stats(default_stat_links, additional_data=[year]))
     print('Stats written for year: {}'.format(year))
+
+FileUtil().upload_to_bucket('fantasy_year_stats.csv', stats_file_name,
+                            os.getenv('FANTASY_DATA_BUCKET', 'fantasy-year-data'))
