@@ -16,3 +16,14 @@ This is a simple set of python programs to scrape and store data from www.pro-fo
     
     
 * Containers also need to set `USE_HEADLESS_BROWSER` for headless browser (we get some better performance locally w/o it set)
+
+
+### Docker Stuff 
+Build the docker container
+`docker build -t py_scrape .`
+
+To run the container with the GCloud stuff you must use the GCloud CLI to login 
+`gcloud auth application-default login`
+
+Running Docker container (including copying in GCloud creds)
+`docker run -it -v=$HOME/.config/gcloud:/root/.config/gcloud py_scrape:latest`

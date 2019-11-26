@@ -7,7 +7,7 @@ class BrowserUtil:
     def __init__(self):
         self.chromedriver_path = os.environ['CHROMEDRIVER_PATH']
 
-        if "USE_HEADLESS_BROWSER" in os.environ:
+        if "RUNNING_IN_CONTAINER" in os.environ:
             self.headless_browser = True
         else:
             self.headless_browser = False
@@ -17,9 +17,9 @@ class BrowserUtil:
 
         if self.headless_browser:
             options = webdriver.ChromeOptions()
-            options.add_argument('--no-sandbox')
             options.add_argument('--headless')
-            options.add_argument('--disable-gpu')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
         else:
             options = Options()
             options.headless = True

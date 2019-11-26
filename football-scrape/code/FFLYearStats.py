@@ -22,7 +22,7 @@ def parse_html():
 
 # write the html to file for easier work later
 def write_page_html(page_html):
-    html_file_name = os.path.join(dir_name, '..', path, 'pages', 'fflYears', 'fantasy_' + str(year) + '.html')
+    html_file_name = os.path.join(dir_name, '..', path, 'fantasy_' + str(year) + '.html')
 
     f = open(html_file_name, 'w')
     f.write(page_html)
@@ -30,8 +30,11 @@ def write_page_html(page_html):
 
     print(html_file_name)
 
-    FileUtil().upload_to_bucket('fantasy_' + str(year) + '.html', html_file_name,
-                                os.getenv('FANTASY_HTML_BUCKET', 'fantasy-year-html'))
+    if bool(os.getenv('FANTASY_DATA_BUCKET', True)):
+        FileUtil().upload_to_bucket('fantasy_' + str(year) + '.html', html_file_name,
+                                    os.getenv('FANTASY_HTML_BUCKET', 'fantasy-year-html'))
+
+        os.remove(html_file_name)
 
 
 def write_stat_headers(header_data):
@@ -54,14 +57,14 @@ table_id = 'fantasy'  # Id of the table to be parsed
 base_url = 'https://www.pro-football-reference.com/years/{}/fantasy.htm'  # base url of years to iterate
 dir_name = os.path.dirname(__file__)  # project directory base path
 path = r"files"  # directory within the project to write file output
-stats_file_name = os.path.join(dir_name, '..', path, 'stats', table_id + '.csv')
+stats_file_name = os.path.join(dir_name, '..', path, table_id + '.csv')
 
 default_stat_links = [2, 3]
 
 write_headers = True
 
 # Loop from 1992 to 2018 (We don't have targets before 1992)
-for year in range(os.getenv('START_YEAR', 1992), os.getenv('END_YEAR', 1993)):
+for year in range(int(os.getenv('START_YEAR', 1992)), int(os.getenv('END_YEAR', 1993))):
     url = base_url.format(year)
 
     # parse the html page
@@ -82,3 +85,5 @@ for year in range(os.getenv('START_YEAR', 1992), os.getenv('END_YEAR', 1993)):
 
 FileUtil().upload_to_bucket('fantasy_year_stats.csv', stats_file_name,
                             os.getenv('FANTASY_DATA_BUCKET', 'fantasy-year-data'))
+
+os.remove(stats_file_name)
