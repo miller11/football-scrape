@@ -28,11 +28,11 @@ class TableParser:
                 if use_data_stat_label:
                     cols.append(ele['data-stat'].strip().encode('utf-8'))
                 else:
-                    cols.append(ele.text.strip().encode('utf-8'))
+                    cols.append(ele.text.strip())
 
             # For all the stat links get the name of the stat and append them to the header list
             for stat_link in stat_links:
-                cols.append(cols[stat_link] + " Link".encode('ascii'))
+                cols.append(cols[stat_link] + " Link".encode('utf-8'))
 
             return cols
 

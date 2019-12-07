@@ -10,6 +10,7 @@ from FileUtil import FileUtil
 def parse_html():
     browser_util = BrowserUtil()
     browser = browser_util.get_browser()
+    browser.set_page_load_timeout(45)
 
     browser.get(url)
     inner_html = browser.execute_script("return document.body.innerHTML")
@@ -86,4 +87,5 @@ for year in range(int(os.getenv('START_YEAR', 1992)), int(os.getenv('END_YEAR', 
 FileUtil().upload_to_bucket('fantasy_year_stats.csv', stats_file_name,
                             os.getenv('FANTASY_DATA_BUCKET', 'fantasy-year-data'))
 
-os.remove(stats_file_name)
+if "RUNNING_IN_CONTAINER" in os.environ:
+    os.remove(stats_file_name)

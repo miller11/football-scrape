@@ -14,7 +14,6 @@ class BrowserUtil:
 
     def get_browser(self):
         # get headless chrome driver and get inner html
-
         if self.headless_browser:
             options = webdriver.ChromeOptions()
             options.add_argument('--headless')

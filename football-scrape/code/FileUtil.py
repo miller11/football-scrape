@@ -8,10 +8,6 @@ class FileUtil:
 
     def upload_to_bucket(self, file_name, file, bucket_name):
         """ Upload data to a bucket"""
-        self.storage_client.list_buckets()
-
-        # print(buckets = list(storage_client.list_buckets())
-
         bucket = self.storage_client.get_bucket(bucket_name)
         blob = bucket.blob(file_name)
         # blob.upload_from_file(file)
