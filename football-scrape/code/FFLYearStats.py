@@ -58,7 +58,7 @@ table_id = 'fantasy'  # Id of the table to be parsed
 base_url = 'https://www.pro-football-reference.com/years/{}/fantasy.htm'  # base url of years to iterate
 dir_name = os.path.dirname(__file__)  # project directory base path
 path = r"files"  # directory within the project to write file output
-stats_file_name = os.path.join(dir_name, '..', path, table_id + '.csv')
+stats_file_name = os.path.join(dir_name, '..', path, table_id + '_year' + '.csv')
 
 default_stat_links = [2, 3]
 

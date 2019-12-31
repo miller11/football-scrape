@@ -25,14 +25,11 @@ class TableParser:
             headers = header_rows[0].find_all('th')
 
             for ele in headers:
-                if use_data_stat_label:
-                    cols.append(ele['data-stat'].strip().encode('utf-8'))
-                else:
-                    cols.append(ele.text.strip())
+                cols.append(ele['data-stat'].strip().encode('utf-8').decode("utf-8"))
 
             # For all the stat links get the name of the stat and append them to the header list
             for stat_link in stat_links:
-                cols.append(cols[stat_link] + " Link".encode('utf-8'))
+                cols.append((cols[stat_link] + " Link"))
 
             return cols
 
