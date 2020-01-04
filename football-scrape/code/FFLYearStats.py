@@ -1,41 +1,9 @@
 #!/usr/bin/python
 import csv
 import os
-from bs4 import BeautifulSoup
 from TableParser import TableParser
 from BrowserUtil import BrowserUtil
 from FileUtil import FileUtil
-
-
-def parse_html():
-    browser_util = BrowserUtil()
-    browser = browser_util.get_browser()
-    browser.set_page_load_timeout(45)
-
-    browser.get(url)
-    inner_html = browser.execute_script("return document.body.innerHTML")
-
-    write_page_html(inner_html)
-
-    # Parse the page with BeautifulSoup
-    return BeautifulSoup(inner_html, 'html.parser')
-
-
-# write the html to file for easier work later
-def write_page_html(page_html):
-    html_file_name = os.path.join(dir_name, '..', path, 'fantasy_' + str(year) + '.html')
-
-    f = open(html_file_name, 'w')
-    f.write(page_html)
-    f.close()
-
-    print(html_file_name)
-
-    if bool(os.getenv('FANTASY_DATA_BUCKET', True)):
-        FileUtil().upload_to_bucket('fantasy_' + str(year) + '.html', html_file_name,
-                                    os.getenv('FANTASY_HTML_BUCKET', 'fantasy-year-html'))
-
-        os.remove(html_file_name)
 
 
 def write_stat_headers(header_data):
@@ -69,7 +37,8 @@ for year in range(int(os.getenv('START_YEAR', 1992)), int(os.getenv('END_YEAR', 
     url = base_url.format(year)
 
     # parse the html page
-    soup = parse_html()
+    browser_util = BrowserUtil()
+    soup = browser_util.parse_html(url, stats_file_name)
 
     # instantiate the table parser
     tableParser = TableParser(soup, table_id)

@@ -1,6 +1,8 @@
 import os
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
+from bs4 import BeautifulSoup
+from FileUtil import FileUtil
 
 
 class BrowserUtil:
@@ -11,6 +13,34 @@ class BrowserUtil:
             self.headless_browser = True
         else:
             self.headless_browser = False
+
+    # write the html to file for easier work later
+    @staticmethod
+    def write_page_html(page_html, html_file_name):
+        f = open(html_file_name, 'w')
+        f.write(page_html)
+        f.close()
+
+        print(html_file_name)
+
+        if bool(os.getenv('SAVE_HTML', True)):
+            FileUtil().upload_to_bucket(html_file_name, html_file_name,
+                                        os.getenv('HTML_BUCKET', 'pfr-html-files'))
+
+            os.remove(html_file_name)
+
+    def parse_html(self, url, stats_file_name):
+        browser_util = BrowserUtil()
+        browser = browser_util.get_browser()
+        browser.set_page_load_timeout(45)
+
+        browser.get(url)
+        inner_html = browser.execute_script("return document.body.innerHTML")
+
+        self.write_page_html(inner_html, stats_file_name)
+
+        # Parse the page with BeautifulSoup
+        return BeautifulSoup(inner_html, 'html.parser')
 
     def get_browser(self):
         # get headless chrome driver and get inner html

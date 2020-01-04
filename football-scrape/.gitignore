@@ -9,3 +9,5 @@
 /webdriver/chromedriver
 
 /venv
+
+/code/__pycache__

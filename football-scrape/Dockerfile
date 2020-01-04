@@ -6,10 +6,11 @@ ENV RUNNING_IN_CONTAINER True
 ENV CHROMEDRIVER_PATH "/usr/bin/chromedriver"
 ENV GCP_PROJECT_NAME "football-scrape"
 
-ENV FANTASY_HTML_BUCKET "fantasy-year-html"
+ENV HTML_BUCKET "pfr-html-files"
 ENV FANTASY_DATA_BUCKET "fantasy-year-data"
 
 ENV SAVE_HTML True
+ENV GET_FRESH_HTML False
 
 
 ENV START_YEAR "1992"
