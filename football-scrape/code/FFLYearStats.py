@@ -24,9 +24,8 @@ def write_stats(table_data):
 # Constants
 table_id = 'fantasy'  # Id of the table to be parsed
 base_url = 'https://www.pro-football-reference.com/years/{}/fantasy.htm'  # base url of years to iterate
-dir_name = os.path.dirname(__file__)  # project directory base path
-path = r"files"  # directory within the project to write file output
-stats_file_name = os.path.join(dir_name, '..', path, table_id + '_year' + '.csv')
+files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+stats_file_name = table_id + '_year' + '.csv'
 
 default_stat_links = [2, 3]
 
@@ -38,7 +37,7 @@ for year in range(int(os.getenv('START_YEAR', 1992)), int(os.getenv('END_YEAR', 
 
     # parse the html page
     browser_util = BrowserUtil()
-    soup = browser_util.parse_html(url, stats_file_name)
+    soup = browser_util.parse_html(url, str(year) + '_fantasy.htm')
 
     # instantiate the table parser
     tableParser = TableParser(soup, table_id)
@@ -53,8 +52,8 @@ for year in range(int(os.getenv('START_YEAR', 1992)), int(os.getenv('END_YEAR', 
     write_stats(tableParser.parse_stats(default_stat_links, additional_data=[year]))
     print('Stats written for year: {}'.format(year))
 
-FileUtil().upload_to_bucket('fantasy_year_stats.csv', stats_file_name,
+FileUtil().upload_to_bucket('fantasy_year_stats.csv', os.path.join(files_dir, stats_file_name),
                             os.getenv('FANTASY_DATA_BUCKET', 'fantasy-year-data'))
 
 if "RUNNING_IN_CONTAINER" in os.environ:
-    os.remove(stats_file_name)
+    os.remove(os.path.join(files_dir, stats_file_name))
