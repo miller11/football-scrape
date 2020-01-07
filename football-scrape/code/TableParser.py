@@ -6,7 +6,7 @@ class TableParser:
         self.soup = soup
         self.table_id = table_id
 
-    def parse_headers(self, stat_links, additional_headers=None, use_data_stat_label=False):
+    def parse_headers(self, stat_links, additional_headers=None, use_aria_label_label=False):
         if self.soup.find('table', attrs={'id': self.table_id}):
 
             # Get the table header
@@ -25,7 +25,11 @@ class TableParser:
             headers = header_rows[0].find_all('th')
 
             for ele in headers:
-                cols.append(ele['data-stat'].strip().encode('utf-8').decode("utf-8"))
+                if use_aria_label_label:
+                    cols.append(ele['aria-label'].strip().encode('utf-8').decode("utf-8")
+                                .replace('/', '_per_').replace(' ', '_').lower())
+                else:
+                    cols.append(ele['data-stat'].strip().encode('utf-8').decode("utf-8"))
 
             # For all the stat links get the name of the stat and append them to the header list
             for stat_link in stat_links:
