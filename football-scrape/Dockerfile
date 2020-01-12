@@ -2,12 +2,15 @@ FROM nickgryg/alpine-pandas
 
 RUN apk upgrade && apk add chromium chromium-chromedriver
 
+RUN apk add --update gcc libc-dev linux-headers && rm -rf /var/cache/apk/*
+
 ENV RUNNING_IN_CONTAINER True
 ENV CHROMEDRIVER_PATH "/usr/bin/chromedriver"
 ENV GCP_PROJECT_NAME "football-scrape"
 
 ENV HTML_BUCKET "pfr-html-files"
 ENV FANTASY_DATA_BUCKET "fantasy-year-data"
+ENV TEAM_YEAR_BUCKET "team-year-data"
 
 ENV SAVE_HTML True
 ENV GET_FRESH_HTML False
@@ -24,6 +27,6 @@ COPY code/ /usr/workspace/code
 
 COPY requirements.txt /usr/workspace
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip3 install --upgrade pip && pip3 install -r requirements.txt
 
-ENTRYPOINT ["/bin/sh"]
+ENTRYPOINT ["python3"]

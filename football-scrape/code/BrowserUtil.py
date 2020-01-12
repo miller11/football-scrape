@@ -1,6 +1,7 @@
 import os
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 from FileUtil import FileUtil
 
@@ -30,12 +31,25 @@ class BrowserUtil:
             os.remove(html_file_name)
 
     def parse_html(self, url, stats_file_name):
-        browser_util = BrowserUtil()
-        browser = browser_util.get_browser()
-        browser.set_page_load_timeout(45)
+        inner_html = ''
 
-        browser.get(url)
-        inner_html = browser.execute_script("return document.body.innerHTML")
+        try:
+            browser_util = BrowserUtil()
+            browser = browser_util.get_browser()
+            browser.set_page_load_timeout(45)
+
+            browser.get(url)
+            inner_html = browser.execute_script("return document.body.innerHTML")
+            browser.close()
+
+        except TimeoutException:
+            browser_util = BrowserUtil()
+            browser = browser_util.get_browser()
+            browser.set_page_load_timeout(45)
+
+            browser.get(url)
+            inner_html = browser.execute_script("return document.body.innerHTML")
+            browser.close()
 
         self.write_page_html(inner_html, stats_file_name)
 

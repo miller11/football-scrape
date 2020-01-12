@@ -1,7 +1,10 @@
-google
 numpy
 pandas
 beautifulsoup4==4.8.0
 selenium==3.141.0
+google
+google-cloud-bigquery
 google-cloud-storage
 oauth2client
+psutil
+pympler
