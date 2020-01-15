@@ -1,10 +1,7 @@
-import os
-import psutil
 import re
 import gc
 import pandas as pd
 from BrowserUtil import BrowserUtil
-from FileUtil import FileUtil
 from TableParser import TableParser
 
 
@@ -12,8 +9,6 @@ class TeamYearUtil:
     def __init__(self, team_link):
         # Constants
         self.base_url = 'https://www.pro-football-reference.com'  # base url of years to iterate
-        self.dir_name = os.path.dirname(__file__)  # project directory base path
-        self.files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
 
         # build file name (e.g. 'team_crd_2019.htm')
         url_pieces = team_link.split("/")
@@ -26,20 +21,6 @@ class TeamYearUtil:
         self.team_link = team_link
 
         del browser_util
-
-    def write_to_file(self, df):
-        df.to_csv(os.path.join(self.files_dir, self.csv_file_name), index=False, encoding='utf-8')
-        del df
-
-        FileUtil().upload_to_bucket(self.csv_file_name, os.path.join(self.files_dir, self.csv_file_name),
-                                    os.getenv('TEAM_YEAR_BUCKET', 'team-year-data'))
-
-        print('File uploaded to bucket')
-
-        if "RUNNING_IN_CONTAINER" in os.environ:
-            os.remove(os.path.join(self.files_dir, self.csv_file_name))
-
-        return True
 
     def get_record(self):
         result = self.soup.find('strong', text=re.compile('Record:'))  # get record paragraph
@@ -108,7 +89,7 @@ class TeamYearUtil:
 
         return data_dict
 
-    def write_file(self):
+    def get_team_year_stats(self):
         gc.collect()
         # team_link = '/teams/crd/2019.htm'
 
@@ -130,9 +111,4 @@ class TeamYearUtil:
         del self.soup
 
         # Write to file and capture that headers were written
-        self.write_to_file(pd.DataFrame(data, index=[0]))
-
-        gc.collect()
-
-        print('Team stats processed for: {}. CPU%: {}. Memory: {}'.format(self.team_link, psutil.cpu_percent(),
-                                                                          dict(psutil.virtual_memory()._asdict())))
+        return pd.DataFrame(data, index=[0])
