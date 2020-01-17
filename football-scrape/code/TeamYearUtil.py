@@ -95,7 +95,7 @@ class TeamYearUtil:
 
         data = {'team_link': self.team_link}
 
-        # Get the heading data4
+        # Get the heading data
         data.update(self.get_record())
         data.update(self.get_coach())
         data.update(self.get_points_for())
@@ -110,5 +110,5 @@ class TeamYearUtil:
         self.soup.decompose()
         del self.soup
 
-        # Write to file and capture that headers were written
+        # Return data frame of all the data collected
         return pd.DataFrame(data, index=[0])
