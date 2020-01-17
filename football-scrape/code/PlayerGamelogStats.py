@@ -2,6 +2,7 @@
 import os
 import gc
 import pandas as pd
+import psutil
 from pympler.tracker import SummaryTracker
 from google.cloud import bigquery  # Imports the Google Cloud client library
 from PlayerGamelogUtil import PlayerGamelogUtil
@@ -42,9 +43,10 @@ for row in player_links:
 
         data_frames.append(player_gamelog_util.get_gamelog_stats())
 
-        print('Player processed: ' + player_link)
-
         gc.collect()
+
+        print('Player processed for: {}. CPU%: {}. Memory: {}'.format(player_link, psutil.cpu_percent(),
+                                                                          dict(psutil.virtual_memory()._asdict())))
 
 write_to_file(pd.concat(data_frames, axis=0, sort=True))
 
