@@ -3,7 +3,6 @@ import os
 import gc
 import pandas as pd
 import psutil
-from pympler.tracker import SummaryTracker
 from google.cloud import bigquery  # Imports the Google Cloud client library
 from PlayerGamelogUtil import PlayerGamelogUtil
 
@@ -29,9 +28,6 @@ query = "SELECT player_Link " \
 bq_query = bq_client.query(query, location='US')
 player_links = bq_query.to_dataframe().values
 
-
-tracker = SummaryTracker()
-
 data_frames = []
 
 # iterate through team links
@@ -51,5 +47,3 @@ for row in player_links:
 write_to_file(pd.concat(data_frames, axis=0, sort=True))
 
 print('All player game-logs written')
-
-tracker.print_diff()
