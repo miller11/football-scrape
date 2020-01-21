@@ -54,7 +54,6 @@ for row in team_links:
         time.sleep(1)
 
 
-
 tracker.print_diff()
 
 print('All teams written')

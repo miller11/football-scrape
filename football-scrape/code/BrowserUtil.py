@@ -30,8 +30,21 @@ class BrowserUtil:
 
             os.remove(html_file_name)
 
-    def parse_html(self, url, stats_file_name):
-        inner_html = ''
+    @staticmethod
+    def use_cached_file(html_file_name):
+        return os.getenv('USE_CACHED_FILES', False) and FileUtil().check_file_exists(html_file_name,
+                                                                                     os.getenv('HTML_BUCKET',
+                                                                                               'pfr-html-files'))
+
+    def parse_html(self, url, html_file_name):
+        if self.use_cached_file(html_file_name):
+            print('Using cached file: ' + html_file_name)
+            FileUtil().download_file(html_file_name, html_file_name, os.getenv('HTML_BUCKET', 'pfr-html-files'))
+
+            soup = BeautifulSoup(open(html_file_name), "html.parser")
+            os.remove(html_file_name)
+
+            return soup
 
         try:
             browser_util = BrowserUtil()
@@ -51,7 +64,7 @@ class BrowserUtil:
             inner_html = browser.execute_script("return document.body.innerHTML")
             browser.close()
 
-        self.write_page_html(inner_html, stats_file_name)
+        self.write_page_html(inner_html, html_file_name)
 
         # Parse the page with BeautifulSoup
         return BeautifulSoup(inner_html, 'html.parser')
