@@ -9,12 +9,8 @@ from queue import Queue
 from threading import Thread
 
 from multiprocessing.dummy import Pool as ThreadPool
-
-
 from google.cloud import bigquery  # Imports the Google Cloud client library
 from PlayerGamelogUtil import PlayerGamelogUtil
-
-GAMELOG_STATS_FILENAME = 'player_gamelog_stats.csv'
 
 
 def write_to_file(df):
@@ -43,15 +39,23 @@ def crawl(data):
 # constants
 dir_name = os.path.dirname(__file__)  # project directory base path
 files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+GAMELOG_STATS_FILENAME = 'player_gamelog_stats_{}.csv'.format(os.getenv('START_YEAR', 1992))
+
 
 # Query BQ to get distinct player links
 bq_client = bigquery.Client(os.getenv('GCP_PROJECT_NAME', 'football-scrape'))
+query_params = [
+    bigquery.ScalarQueryParameter('start_year', 'INTEGER', os.getenv('START_YEAR', 1992))
+]
+job_config = bigquery.QueryJobConfig()
+job_config.query_parameters = query_params
 query = "SELECT player_Link " \
         "FROM `football-scrape.footballDataset.player_fantasy_year` " \
+        "WHERE Year >= @start_year " \
         "GROUP BY player_Link " \
         "ORDER BY player_Link " \
 
-bq_query = bq_client.query(query, location='US')
+bq_query = bq_client.query(query, job_config=job_config, location='US')
 player_links = bq_query.to_dataframe().values
 
 data_frames = []
