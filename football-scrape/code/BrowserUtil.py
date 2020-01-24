@@ -32,7 +32,7 @@ class BrowserUtil:
 
     @staticmethod
     def use_cached_file(html_file_name):
-        return os.getenv('USE_CACHED_FILES', False) and FileUtil().check_file_exists(html_file_name,
+        return bool(os.getenv('USE_CACHED_FILES', False)) and FileUtil().check_file_exists(html_file_name,
                                                                                      os.getenv('HTML_BUCKET',
                                                                                                'pfr-html-files'))
 

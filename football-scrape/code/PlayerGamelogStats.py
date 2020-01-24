@@ -2,6 +2,7 @@
 import os
 import gc
 import pandas as pd
+import numpy
 import psutil
 import time
 
@@ -39,24 +40,20 @@ def crawl(data):
 # constants
 dir_name = os.path.dirname(__file__)  # project directory base path
 files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
-GAMELOG_STATS_FILENAME = 'player_gamelog_stats_{}.csv'.format(os.getenv('START_YEAR', 1992))
+GAMELOG_STATS_FILENAME = 'player_gamelog_stats_{}.csv'.format(os.getenv('GAME_LOG_CHUNK', 0))
 
 
 # Query BQ to get distinct player links
 bq_client = bigquery.Client(os.getenv('GCP_PROJECT_NAME', 'football-scrape'))
-query_params = [
-    bigquery.ScalarQueryParameter('start_year', 'INTEGER', os.getenv('START_YEAR', 1992))
-]
-job_config = bigquery.QueryJobConfig()
-job_config.query_parameters = query_params
 query = "SELECT player_Link " \
         "FROM `football-scrape.footballDataset.player_fantasy_year` " \
-        "WHERE Year >= @start_year " \
         "GROUP BY player_Link " \
         "ORDER BY player_Link " \
 
-bq_query = bq_client.query(query, job_config=job_config, location='US')
+bq_query = bq_client.query(query, location='US')
 player_links = bq_query.to_dataframe().values
+
+player_links = numpy.array_split(numpy.array(player_links), 3)[int(os.getenv('GAME_LOG_CHUNK', 0))]
 
 data_frames = []
 
