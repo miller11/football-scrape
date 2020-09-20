@@ -8,14 +8,14 @@ from FileUtil import FileUtil
 
 def write_stat_headers(header_data):
     # Start a new file and write headers to the file
-    with open(stats_file_name, 'w') as writeFile:
+    with open(os.path.join(files_dir, stats_file_name), 'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerow(header_data)
     writeFile.close()
 
 
 def write_stats(table_data):
-    with open(stats_file_name, 'a') as writeFile:
+    with open(os.path.join(files_dir, stats_file_name), 'a') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(table_data)
     writeFile.close()

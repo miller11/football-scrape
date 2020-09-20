@@ -6,12 +6,10 @@ import numpy
 import psutil
 import time
 
-from queue import Queue
-from threading import Thread
-
 from multiprocessing.dummy import Pool as ThreadPool
 from google.cloud import bigquery  # Imports the Google Cloud client library
 from PlayerGamelogUtil import PlayerGamelogUtil
+from FileUtil import FileUtil
 
 
 def write_to_file(df):
@@ -38,7 +36,6 @@ def crawl(data):
 
 
 # constants
-dir_name = os.path.dirname(__file__)  # project directory base path
 files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
 GAMELOG_STATS_FILENAME = 'player_gamelog_stats_{}.csv'.format(os.getenv('GAME_LOG_CHUNK', 0))
 
@@ -65,5 +62,8 @@ pool.close()
 pool.join()
 
 write_to_file(pd.concat(data_frames, axis=0, sort=True))
+
+FileUtil().upload_to_bucket(GAMELOG_STATS_FILENAME, os.path.join(files_dir, GAMELOG_STATS_FILENAME),
+                            os.getenv('FANTASY_DATA_BUCKET', 'fantasy-year-data'))
 
 print('All player game-logs written')
