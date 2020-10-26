@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import gc
+import pandas as pd
 import psutil
 import time
 from pympler.tracker import SummaryTracker
@@ -12,14 +13,8 @@ YEAR_STATS_CSV = 'team_year_stats.csv'
 
 
 def write_to_file(df):
-    if not headers_written:
-        df.to_csv(os.path.join(files_dir, YEAR_STATS_CSV), index=False, encoding='utf-8')
-        del df
-        return True
-    else:
-        df.to_csv(os.path.join(files_dir, YEAR_STATS_CSV), index=False, encoding='utf-8', mode='a', header=False)
-        del df
-        return True
+    df.to_csv(os.path.join(files_dir, YEAR_STATS_CSV), index=False, encoding='utf-8')
+    return True
 
 
 # constants
@@ -33,10 +28,9 @@ query = "SELECT team_Link FROM `football-scrape.footballDataset.player_fantasy_y
 bq_query = bq_client.query(query, location='US')
 team_links = bq_query.to_dataframe().values
 
-
 tracker = SummaryTracker()
 
-headers_written = False
+data_frames = []
 
 # iterate through team links
 for row in team_links:
@@ -44,15 +38,16 @@ for row in team_links:
         team_year_util = TeamYearUtil(row[0])
         team_df = team_year_util.get_team_year_stats()
 
-        headers_written = write_to_file(team_df)
-
-        gc.collect()
+        data_frames.append(team_df)
 
         print('Team stats processed for: {}. CPU%: {}. Memory: {}'.format(row[0], psutil.cpu_percent(),
                                                                           dict(psutil.virtual_memory()._asdict())))
 
+        gc.collect()
         time.sleep(1)
 
+# concat dataframes and write to file
+write_to_file(pd.concat(data_frames, axis=0, sort=True))
 
 tracker.print_diff()
 
@@ -67,5 +62,4 @@ if "RUNNING_IN_CONTAINER" in os.environ:
     os.remove(os.path.join(files_dir, YEAR_STATS_CSV))
 
 print('All teams written')
-
 
