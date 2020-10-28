@@ -19,7 +19,7 @@ def write_to_file(df):
 
 # constants
 dir_name = os.path.dirname(__file__)  # project directory base path
-files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+files_dir = os.path.join(os.path.dirname(__file__), '../..', 'files')
 
 # Query BQ to get distinct team links
 bq_client = bigquery.Client(os.getenv('GCP_PROJECT_NAME', 'football-scrape'))

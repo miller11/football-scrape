@@ -12,7 +12,7 @@ import pandas as pd
 def get_players():
     players_temp = []
 
-    with open(os.path.join(dir_name, '..', path, 'stats', 'fantasy.csv'), 'r') as readFile:
+    with open(os.path.join(dir_name, '../..', path, 'stats', 'fantasy.csv'), 'r') as readFile:
         reader = csv.reader(readFile)
         next(reader)  # Skip header row
         for row in reader:
@@ -31,7 +31,7 @@ def write_page_html(page_html, player_link):
     player_link = player_link.replace('/', '').replace('.htm', '')
 
     # Start a new file and write headers to the file
-    html_file_name = os.path.join(dir_name, '..', path, 'pages', 'playerStats', player_link + str(year) + '.html')
+    html_file_name = os.path.join(dir_name, '../..', path, 'pages', 'playerStats', player_link + str(year) + '.html')
 
     f = open(html_file_name, 'w')
     f.write(page_html)
@@ -41,7 +41,7 @@ def write_page_html(page_html, player_link):
 # simple method to output the pandas dataframe to csv in the stats folder
 def write_file(data_frame, file_year):
     # Start a new file and write data frame to the file
-    data_frame.to_csv(os.path.join(dir_name, '..', path, 'stats', 'weekly_stats_' + file_year.__str__() + '.csv'),
+    data_frame.to_csv(os.path.join(dir_name, '../..', path, 'stats', 'weekly_stats_' + file_year.__str__() + '.csv'),
                       encoding='utf-8')
 
 

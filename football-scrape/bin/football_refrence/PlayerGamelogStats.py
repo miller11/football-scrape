@@ -36,7 +36,7 @@ def crawl(data):
 
 
 # constants
-files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+files_dir = os.path.join(os.path.dirname(__file__), '../..', 'files')
 GAMELOG_STATS_FILENAME = 'player_gamelog_stats_{}.csv'.format(os.getenv('GAME_LOG_CHUNK', 0))
 
 

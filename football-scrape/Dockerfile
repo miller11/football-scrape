@@ -24,7 +24,7 @@ WORKDIR "/usr/workspace"
 
 RUN mkdir -p /usr/workspace/code && mkdir -p /usr/workspace/files
 
-COPY code/ /usr/workspace/code
+COPY bin/ /usr/workspace/code
 
 COPY requirements.txt /usr/workspace
 

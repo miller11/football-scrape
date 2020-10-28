@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 import psutil
 import json
-from FileUtil import FileUtil
+from .util.FileUtil import FileUtil
 
 # constants
 FILES_DIR = os.path.join(os.path.dirname(__file__), '..', 'files')
